@@ -20,6 +20,7 @@ class task_strings(Task):
         self.resultstrings = []
         self.execution_level = 0
         self.tmessage = "STRINGS TASK %d :: " % (self.sid)
+        self.tstart = 0
 
     def execute(self):
         self.tstart = int(time.time())
@@ -35,13 +36,13 @@ class task_strings(Task):
                               for ws in re.findall("(?:[\x1f-\x7e][\x00]){6,}",
                                                    data)]
             for s in asciistrings:
-                x = (StringsType.ASCII, s)
-                if x not in self.resultstrings:
-                    self.resultstrings.append(x)
+                tmp = (StringsType.ASCII, s)
+                if tmp not in self.resultstrings:
+                    self.resultstrings.append(tmp)
             for s in unicodestrings:
-                x = (StringsType.UNICODE, s)
-                if x not in self.resultstrings:
-                    self.resultstrings.append(x)
+                tmp = (StringsType.UNICODE, s)
+                if tmp not in self.resultstrings:
+                    self.resultstrings.append(tmp)
         else:
             return False
         return True
