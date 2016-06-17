@@ -3,15 +3,12 @@
 """
 
 import os
-import random
 import re
 import datetime
-import yara
 import magic
 import time
 import json
 
-from flask import abort
 from hashlib import md5, sha1, sha256
 from collections import Counter
 from subprocess import Popen
@@ -19,15 +16,12 @@ from graphviz import Source
 
 from app import app
 from app import db
-from app import login_manager
 from app.models.sample import SampleSchema, SampleMetadata, FunctionInfo
-from app.models.sample import SampleMetadataType, StringsItem, StringsType
+from app.models.sample import SampleMetadataType, StringsItem
 from app.models.sample import FileName, Sample, AnalysisStatus, CheckList
 from app.models.sample import SampleMatch
-from app.models.user import User
 from app.models.analysis import AnalysisResult
 from app.models.models import TLPLevel
-from app.models.yara_rule import YaraRule
 from app.models.idaactions import IDAAction
 
 
@@ -50,8 +44,8 @@ class SampleController(object):
             return None
         sha_256 = sha256(file_data).hexdigest()
         sample = None
-        # check if we already had the file or not. If not, we will just update some
-        # information
+        # check if we already had the file or not.
+        # If not, we will just update some information
         if Sample.query.filter_by(sha256=sha_256).count() != 0:
             sample = Sample.query.filter_by(sha256=sha_256).first()
             if sample.storage_file is not None and sample.storage_file != "" and os.path.exists(

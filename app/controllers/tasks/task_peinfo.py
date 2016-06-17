@@ -1,11 +1,9 @@
-import os
 import datetime
 import time
 import pefile
 
-from app import app, db
-from app.models.sample import Sample, SampleMetadata, SampleMetadataType
-from app.models.sample import SampleMatch
+from app import app
+from app.models.sample import SampleMetadataType
 from app.controllers.task import Task
 from app.controllers.sample import SampleController
 
@@ -14,7 +12,8 @@ class task_peinfo(Task):
     """
     Extract basic metadata from pefile.
 
-    TODO: also extract (and store, which is the current challenge) Exports, Imports and Sections.
+    TODO: also extract (and store, which is the current challenge)
+        Exports, Imports and Sections.
     """
 
     def __init__(self, sample):
@@ -25,6 +24,8 @@ class task_peinfo(Task):
         self.matches = []
         self.metadata_extracted = []
         self.fpath = sample.storage_file
+        self.tmessage = "PEINFO TASK %d :: " % (self.sid)
+
         # ignore non-PE files
         if "application/x-dosexec" not in sample.mime_type:
             self.is_interrested = False
@@ -32,7 +33,6 @@ class task_peinfo(Task):
 
     def execute(self):
         self.tstart = int(time.time())
-        self.tmessage = "PEINFO TASK %d :: " % (self.sid)
         app.logger.debug(self.tmessage + "EXECUTE")
         pe = pefile.PE(self.fpath)
         self.compile_timestamp = datetime.date.fromtimestamp(
@@ -209,13 +209,13 @@ class task_peinfo(Task):
         return True
 
     def apply_result(self):
-        s_controller = SampleController()
-        sample = s_controller.get_by_id(self.sid)
+        sc = SampleController()
+        sample = sc.get_by_id(self.sid)
         app.logger.debug(self.tmessage + "APPLY_RESULT")
         # Compilation timestamp (even when faked) IS a file date, so update it.
-        s_controller.add_multiple_metadata(sample, self.metadata_extracted)
-        s_controller.set_file_date(sample, self.compile_timestamp)
-        s_controller.set_import_hash(sample, self.import_hash)
+        sc.add_multiple_metadata(sample, self.metadata_extracted)
+        sc.set_file_date(sample, self.compile_timestamp)
+        sc.set_import_hash(sample, self.import_hash)
         app.logger.debug(self.tmessage + "END - TIME %i" %
                          (int(time.time()) - self.tstart))
         return True

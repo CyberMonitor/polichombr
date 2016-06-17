@@ -28,7 +28,7 @@ def execute_task(mqueue):
                 if not result:
                     app.logger.error("Error executing task %s" % (mtask))
             except Exception as e:
-                app.logger.error("Error executing task %s (%s)" % (mtask, e))
+                app.logger.error("Exception during task %s" % (mtask))
                 app.logger.exception(e)
                 db.session.rollback()
                 continue
@@ -55,7 +55,7 @@ def execute_yara_task(mqueue):
                 app.logger.error("Error executing yara task %s" % (yara_task))
         except Exception as e:
             db.session.rollback()
-            app.logger.error("Exception exceuting yara task: %s" % (e))
+            app.logger.error("Exception executing yara task")
             app.logger.exception(e)
             continue
     return True

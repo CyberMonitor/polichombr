@@ -2,9 +2,8 @@ import os
 import re
 import time
 
-from app import app, db
-from app.models.sample import Sample
-from app.models.sample import FunctionInfo, StringsItem, StringsType
+from app import app
+from app.models.sample import StringsType
 from app.controllers.task import Task
 from app.controllers.sample import SampleController
 
@@ -20,19 +19,21 @@ class task_strings(Task):
         self.fpath = sample.storage_file
         self.resultstrings = []
         self.execution_level = 0
+        self.tmessage = "STRINGS TASK %d :: " % (self.sid)
 
     def execute(self):
         self.tstart = int(time.time())
-        self.tmessage = "STRINGS TASK %d :: " % (self.sid)
         app.logger.debug(self.tmessage + "EXECUTE")
         if os.path.exists(self.fpath):
             try:
                 data = open(self.fpath, "r").read()
             except (IOError, OSError) as e:
+                app.logger.exception(e)
                 return False
             asciistrings = re.findall("[\x1f-\x7e]{6,}", data)
             unicodestrings = [str(ws.decode("utf-16le"))
-                              for ws in re.findall("(?:[\x1f-\x7e][\x00]){6,}", data)]
+                              for ws in re.findall("(?:[\x1f-\x7e][\x00]){6,}",
+                                                   data)]
             for s in asciistrings:
                 x = (StringsType.ASCII, s)
                 if x not in self.resultstrings:

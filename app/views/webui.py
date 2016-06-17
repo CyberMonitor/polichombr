@@ -1,6 +1,5 @@
 """
-
-    === POLICHOMBR ===
+    This is the main web interface, wich is bootstrapped and pretty ;-)
 
 """
 
@@ -8,15 +7,14 @@ import json
 import os
 import io
 
-from flask import render_template, g, redirect, url_for, flash, abort, make_response, request
+from flask import render_template, g, redirect, url_for, flash
+from flask import abort, make_response, request
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug import secure_filename
-from graphviz import Source
 from zipfile import ZipFile
 
-from app import app, db, api
+from app import app, api
 
-from app.models.user import User
 from app.models.family import Family
 from app.models.sample import Sample, SampleMetadataType
 from app.models.yara_rule import YaraRule
@@ -32,7 +30,7 @@ from app.views.forms import FullTextSearchForm, HashSearchForm
 from app.views.forms import CreateCheckListForm, MachocHashSearchForm
 from app.views.forms import CompareMachocForm
 
-from app.controllers.sample import disassemble_sample, disassemble_sample_get_svg, disassemble_it, beautify_svg
+from app.controllers.sample import disassemble_sample_get_svg
 
 """
 
@@ -93,8 +91,7 @@ def index():
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
     """
-    Flask-Login. The APIKEY authentication is actually performed in the api view file.
-    We should migrate it here.
+    Flask-Login specific
     """
     if g.user.is_authenticated:
         return redirect(url_for('index'))
@@ -151,7 +148,6 @@ def logout():
 @login_required
 def dl_skelenox():
     ipaddr, port = request.host.split(":")
-    skelenox_data = open("skelenox.py", "rb").read()
     zipout = io.BytesIO()
     with ZipFile(zipout, "w") as myzip:
         myzip.write("skelenox.py")

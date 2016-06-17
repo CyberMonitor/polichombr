@@ -47,8 +47,9 @@ class AnalysisFactory(object):
                             app.logger.info("Loaded task %s" % (task_filename))
                 except Exception as e:
                     app.logger.error(
-                        "Could not load %s : %s" %
-                        (task_filename, e))
+                        "Could not load %s" %
+                        (task_filename))
+                    app.logger.exception(e)
                     continue
         return True
 
@@ -74,7 +75,7 @@ class AnalysisFactory(object):
                 if p_instance.will_run():
                     analysis.add_task(p_instance, p_name)
             except Exception as e:
-                app.logger.error("Could not load task %s : %s" % (p_name, e))
+                app.logger.error("Could not assign task %s" % (p_name))
                 app.logger.exception(e)
                 pass
         return True
@@ -188,14 +189,14 @@ class Analysis(object):
         try:
             execution_level = task.execution_level
         except Exception as e:
-            app.logger.warning(
+            app.logger.exception(
                 "Could not read execution_level for task %s, default to 0" %
-                (tname))
+                (tname, e))
             execution_level = 0
         if execution_level < 0:
             execution_level = 0
         if execution_level > 32:
             execution_level = 32
         self.tasks.append((execution_level, task))
-        app.logger.info("Task loaded: %s" % (tname))
+        app.logger.info("Task added: %s" % (tname))
         return True

@@ -14,6 +14,7 @@ class Task(object):
 
     is_interrested = True   # setting this value to False will make the
     # scheduler not call your task's methods.
+    tmessage = ""
 
     def __init__(self, sample=None):
         """
@@ -31,7 +32,11 @@ class Task(object):
             Finally, you can also set your execution_level here, if it must
             be elevated.
         """
+        self.tmessage = "BaseTask"
         pass
+
+    def __repr__(self):
+        return "Task %s" % (self.tmessage)
 
     def execute(self):
         """
